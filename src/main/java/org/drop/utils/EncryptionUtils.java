@@ -1,11 +1,13 @@
 package org.drop.utils;
 
 import java.io.BufferedInputStream;
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.charset.Charset;
+import java.security.AlgorithmParameters;
 import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
 import java.security.Key;
@@ -26,12 +28,16 @@ import java.security.SignatureException;
 import java.security.UnrecoverableKeyException;
 import java.security.cert.Certificate;
 import java.security.cert.CertificateException;
+import java.security.cert.CertificateFactory;
+import java.security.cert.X509Certificate;
 import java.security.spec.AlgorithmParameterSpec;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.KeySpec;
 import java.security.spec.PKCS8EncodedKeySpec;
 import java.security.spec.X509EncodedKeySpec;
+import java.util.ArrayList;
 import java.util.Base64;
+import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
@@ -39,6 +45,7 @@ import java.util.TreeSet;
 
 import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
+import javax.crypto.EncryptedPrivateKeyInfo;
 import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.KeyGenerator;
 import javax.crypto.NoSuchPaddingException;
@@ -219,6 +226,162 @@ public class EncryptionUtils {
 		X509EncodedKeySpec spec = new X509EncodedKeySpec(data);
 		KeyFactory keyFactory = KeyFactory.getInstance(algorithm);
 		return keyFactory.generatePublic(spec);
+	}
+	
+	/**
+	 * Load encrypted private key.
+	 *
+	 * @param certFile the cert file
+	 * @param password the password
+	 * @param keyFactoryType the key factory type; EX: RSA, EC
+	 * @return the private key
+	 * @throws FileNotFoundException the file not found exception
+	 * @throws IOException Signals that an I/O exception has occurred.
+	 * @throws NoSuchAlgorithmException the no such algorithm exception
+	 * @throws NoSuchPaddingException the no such padding exception
+	 * @throws InvalidKeySpecException the invalid key spec exception
+	 * @throws InvalidKeyException the invalid key exception
+	 * @throws InvalidAlgorithmParameterException the invalid algorithm parameter exception
+	 */
+	public static PrivateKey loadEncryptedPrivateKey(File certFile, String password, String keyFactoryType) throws FileNotFoundException, IOException, NoSuchAlgorithmException, NoSuchPaddingException, InvalidKeySpecException, InvalidKeyException, InvalidAlgorithmParameterException {
+		if(certFile == null || !certFile.exists()) {
+			return null;
+		}
+		PrivateKey finalKey = null;
+		try(FileInputStream inStream = new FileInputStream(certFile)){
+			EncryptedPrivateKeyInfo encryptPKInfo = new EncryptedPrivateKeyInfo(inStream.readAllBytes());
+
+		    PBEKeySpec pbeKeySpec = new PBEKeySpec(password.toCharArray());
+		    SecretKeyFactory secFac = SecretKeyFactory.getInstance(encryptPKInfo.getAlgName());
+		    Key pbeKey = secFac.generateSecret(pbeKeySpec);
+		    
+		    AlgorithmParameters algParams = encryptPKInfo.getAlgParameters();
+		    Cipher cipher = Cipher.getInstance(encryptPKInfo.getAlgName());
+		    cipher.init(Cipher.DECRYPT_MODE, pbeKey, algParams);
+		    PKCS8EncodedKeySpec keySpec = encryptPKInfo.getKeySpec(cipher);
+		    
+			KeyFactory keyFactory = KeyFactory.getInstance(keyFactoryType);
+	        finalKey = keyFactory.generatePrivate(keySpec);
+		}
+		return finalKey;
+	}
+	
+	/**
+	 * Load private key.
+	 *
+	 * @param certFile the cert file
+	 * @param keyFactoryType the key factory type
+	 * @return the private key
+	 * @throws FileNotFoundException the file not found exception
+	 * @throws IOException Signals that an I/O exception has occurred.
+	 * @throws CertificateException the certificate exception
+	 * @throws NoSuchAlgorithmException the no such algorithm exception
+	 * @throws InvalidKeySpecException the invalid key spec exception
+	 */
+	//keyFactoryType = RSA, EC
+	public static PrivateKey loadPrivateKey(File certFile, String keyFactoryType) throws FileNotFoundException, IOException, CertificateException, NoSuchAlgorithmException, InvalidKeySpecException {
+		if(certFile == null || !certFile.exists()) {
+			return null;
+		}
+		PrivateKey finalKey = null;
+		try(FileInputStream inStream = new FileInputStream(certFile)){
+			KeyFactory keyFactory = KeyFactory.getInstance(keyFactoryType);
+	        PKCS8EncodedKeySpec keySpec = new PKCS8EncodedKeySpec(inStream.readAllBytes());
+	        finalKey = keyFactory.generatePrivate(keySpec);
+		}
+		return finalKey;
+	}
+	
+	/**
+	 * Public key to X 509.
+	 *
+	 * @param pubKey the pub key
+	 * @return the x 509 certificate
+	 * @throws CertificateException the certificate exception
+	 */
+	public static X509Certificate publicKeyToX509(PublicKey pubKey) throws CertificateException {
+		return publicKeyToX509(pubKey.getEncoded());
+	}
+	
+	/**
+	 * Public key to X 509.
+	 *
+	 * @param pubKey the pub key
+	 * @return the x 509 certificate
+	 * @throws CertificateException the certificate exception
+	 */
+	public static X509Certificate publicKeyToX509(byte[] pubKey) throws CertificateException {
+		CertificateFactory cf = CertificateFactory.getInstance("X.509");
+		return (X509Certificate) cf.generateCertificate(new ByteArrayInputStream(pubKey));
+	}
+	
+	/**
+	 * Load X 509 certificate.
+	 *
+	 * @param certFile the cert file
+	 * @return the x 509 certificate
+	 * @throws FileNotFoundException the file not found exception
+	 * @throws IOException Signals that an I/O exception has occurred.
+	 * @throws CertificateException the certificate exception
+	 */
+	public static X509Certificate loadX509Certificate(File certFile) throws FileNotFoundException, IOException, CertificateException {
+		if(certFile == null || !certFile.exists()) {
+			return null;
+		}
+		X509Certificate x509 = null;
+		try(FileInputStream inStream = new FileInputStream(certFile)){
+			x509 = (X509Certificate) CertificateFactory.getInstance("x509").generateCertificate(inStream);
+		}
+		return x509;
+	}
+	
+	/**
+	 * Gets the all X 509 certificates.
+	 *
+	 * @param keyStore the key store
+	 * @return the all X 509 certificates
+	 * @throws KeyStoreException the key store exception
+	 */
+	public static List<X509Certificate> getAllX509Certificates(KeyStore keyStore) throws KeyStoreException {
+		if(keyStore == null) {
+			return null;
+		}
+		List<X509Certificate> x509Certs = new ArrayList<>();
+		Enumeration<String> aliases = keyStore.aliases();
+		while(aliases.hasMoreElements()) {
+			String alias = aliases.nextElement();
+			Certificate cert = keyStore.getCertificate(alias);
+			if(cert instanceof X509Certificate) {
+				x509Certs.add((X509Certificate)cert);
+			}
+		}
+		return x509Certs;
+	}
+	
+	/**
+	 * Gets the x 509 certificates with alias.
+	 *
+	 * @param keyStore the key store
+	 * @param findAlias the find alias
+	 * @return the x 509 certificates with alias
+	 * @throws KeyStoreException the key store exception
+	 */
+	public static List<X509Certificate> getX509CertificatesWithAlias(KeyStore keyStore, String findAlias) throws KeyStoreException {
+		if(keyStore == null) {
+			return null;
+		}
+		List<X509Certificate> x509Certs = new ArrayList<>();
+		Enumeration<String> aliases = keyStore.aliases();
+		while(aliases.hasMoreElements()) {
+			String alias = aliases.nextElement();
+			if(findAlias.equals(alias)) {
+				Certificate cert = keyStore.getCertificate(alias);
+				if(cert instanceof X509Certificate) {
+					x509Certs.add((X509Certificate)cert);
+				}
+			}
+		}
+		return x509Certs;
 	}
 	
 	/**
