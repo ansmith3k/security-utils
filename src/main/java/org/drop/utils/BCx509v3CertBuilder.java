@@ -69,10 +69,7 @@ public class BCx509v3CertBuilder {
 	
 	/** The encryption type. */
 	private String encryptionType = DEFAULT_ENCRYPTION_TYPE;
-	
-	/** The serial. */
-	private BigInteger serial;
-	
+
 	/** The cert valid num of days. */
 	private Long certValidNumOfDays = DEFAULT_CERT_VALID_DAYS;
 	
@@ -245,23 +242,6 @@ public class BCx509v3CertBuilder {
 		this.encryptionType = encryptionType;
 	}
 	
-	/**
-	 * Gets the serial.
-	 *
-	 * @return the serial
-	 */
-	public BigInteger getSerial() {
-		return serial;
-	}
-	
-	/**
-	 * Sets the serial.
-	 *
-	 * @param serial the new serial
-	 */
-	public void setSerial(BigInteger serial) {
-		this.serial = serial;
-	}
 	
 	/**
 	 * Gets the not before time.
@@ -353,9 +333,7 @@ public class BCx509v3CertBuilder {
 			publicKey = keyPair.getPublic();
 		}
 		
-		if(serial == null) {
-			serial = BigIntegers.createRandomBigInteger(64, secureRandom);
-		}
+		BigInteger serial = BigIntegers.createRandomBigInteger(64, secureRandom);
 		
 		if(notBeforeTime == null) {
 			notBeforeTime = BCUtils.getTime(LocalDateTime.now(), ZoneId.systemDefault());
