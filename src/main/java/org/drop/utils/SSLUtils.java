@@ -1,7 +1,7 @@
 package org.drop.utils;
 
+import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.security.KeyManagementException;
 import java.security.KeyStore;
@@ -37,13 +37,12 @@ public class SSLUtils {
 	 *
 	 * @param sslConfig the ssl config
 	 * @return the key store
-	 * @throws FileNotFoundException the file not found exception
-	 * @throws IOException Signals that an I/O exception has occurred.
 	 * @throws NoSuchAlgorithmException the no such algorithm exception
 	 * @throws CertificateException the certificate exception
 	 * @throws KeyStoreException the key store exception
+	 * @throws IOException Signals that an I/O exception has occurred.
 	 */
-	public static KeyStore getKeyStore(SSLConfig sslConfig) throws FileNotFoundException, IOException, NoSuchAlgorithmException, CertificateException, KeyStoreException {
+	public static KeyStore getKeyStore(SSLConfig sslConfig) throws NoSuchAlgorithmException, CertificateException, KeyStoreException, IOException {
 		return getKeyStore(sslConfig.getKeyStoreFile(), sslConfig.getKeyStorePassword(), sslConfig.getKeyStoreType());
 	}
 	
@@ -54,33 +53,59 @@ public class SSLUtils {
 	 * @param storePass the store pass
 	 * @param storeType the store type
 	 * @return the key store
-	 * @throws FileNotFoundException the file not found exception
-	 * @throws IOException Signals that an I/O exception has occurred.
 	 * @throws NoSuchAlgorithmException the no such algorithm exception
 	 * @throws CertificateException the certificate exception
 	 * @throws KeyStoreException the key store exception
+	 * @throws IOException Signals that an I/O exception has occurred.
 	 */
-	public static KeyStore getKeyStore(String keyStore, String storePass, String storeType) throws FileNotFoundException, IOException, NoSuchAlgorithmException, CertificateException, KeyStoreException {
-		KeyStore store = null;
-		try(FileInputStream inStream = new FileInputStream(keyStore)){
-			store = KeyStore.getInstance(storeType);
-			store.load(inStream, storePass.toCharArray());
-		}
-		return store;
+	public static KeyStore getKeyStore(String keyStore, String storePass, String storeType) throws NoSuchAlgorithmException, CertificateException, KeyStoreException, IOException {
+		return getKeystore(new File(keyStore), storePass, storeType);
 	}
+	
+	/**
+	 * Gets the keystore.
+	 *
+	 * @param keyStoreFile the key store file
+	 * @param keyStorePasswd the key store passwd
+	 * @param keyStoreType the key store type
+	 * @return the keystore
+	 * @throws NoSuchAlgorithmException the no such algorithm exception
+	 * @throws CertificateException the certificate exception
+	 * @throws IOException Signals that an I/O exception has occurred.
+	 * @throws KeyStoreException the key store exception
+	 */
+	public static KeyStore getKeystore(File keyStoreFile, String keyStorePasswd, String keyStoreType) throws NoSuchAlgorithmException, CertificateException, IOException, KeyStoreException {
+		if(keyStoreFile == null) {
+			throw new IllegalArgumentException("Invalid keystore. Keystore is null.");
+		}
+		if(!keyStoreFile.exists()) {
+			throw new IllegalArgumentException("Invalid keystore. Keystore does not exist. " + keyStoreFile.getPath());
+		}
+		
+		KeyStore keystore = null;
+		try(FileInputStream inStream = new FileInputStream(keyStoreFile)){
+			keystore = KeyStore.getInstance(keyStoreType);
+			if(keyStorePasswd != null) {
+				keystore.load(inStream, keyStorePasswd.toCharArray());
+			}else {
+				keystore.load(inStream, null);
+			}
+		}
+		return keystore;
+	}
+	
 	
 	/**
 	 * Gets the trust store.
 	 *
 	 * @param sslConfig the ssl config
 	 * @return the trust store
-	 * @throws FileNotFoundException the file not found exception
-	 * @throws IOException Signals that an I/O exception has occurred.
 	 * @throws NoSuchAlgorithmException the no such algorithm exception
 	 * @throws CertificateException the certificate exception
 	 * @throws KeyStoreException the key store exception
+	 * @throws IOException Signals that an I/O exception has occurred.
 	 */
-	public static KeyStore getTrustStore(SSLConfig sslConfig) throws FileNotFoundException, IOException, NoSuchAlgorithmException, CertificateException, KeyStoreException {
+	public static KeyStore getTrustStore(SSLConfig sslConfig) throws NoSuchAlgorithmException, CertificateException, KeyStoreException, IOException {
 		return getTrustStore(sslConfig.getTrustStoreFile(), sslConfig.getTrustStorePassword(), sslConfig.getTrustStoreType());
 	}
 	
@@ -91,19 +116,13 @@ public class SSLUtils {
 	 * @param storePass the store pass
 	 * @param storeType the store type
 	 * @return the trust store
-	 * @throws FileNotFoundException the file not found exception
-	 * @throws IOException Signals that an I/O exception has occurred.
 	 * @throws NoSuchAlgorithmException the no such algorithm exception
 	 * @throws CertificateException the certificate exception
 	 * @throws KeyStoreException the key store exception
+	 * @throws IOException Signals that an I/O exception has occurred.
 	 */
-	public static KeyStore getTrustStore(String trustStore, String storePass, String storeType) throws FileNotFoundException, IOException, NoSuchAlgorithmException, CertificateException, KeyStoreException {
-		KeyStore store = null;
-		try(FileInputStream inStream = new FileInputStream(trustStore)){
-			store = KeyStore.getInstance(storeType);
-			store.load(inStream, storePass.toCharArray());
-		}
-		return store;
+	public static KeyStore getTrustStore(String trustStore, String storePass, String storeType) throws NoSuchAlgorithmException, CertificateException, KeyStoreException, IOException {
+		return getKeystore(new File(trustStore), storePass, storeType);
 	}
 	
 	/**
@@ -111,12 +130,12 @@ public class SSLUtils {
 	 *
 	 * @param sslConfig the ssl config
 	 * @return the empty key store
-	 * @throws KeyStoreException the key store exception
 	 * @throws NoSuchAlgorithmException the no such algorithm exception
 	 * @throws CertificateException the certificate exception
+	 * @throws KeyStoreException the key store exception
 	 * @throws IOException Signals that an I/O exception has occurred.
 	 */
-	public static KeyStore getEmptyKeyStore(SSLConfig sslConfig) throws KeyStoreException, NoSuchAlgorithmException, CertificateException, IOException  {
+	public static KeyStore getEmptyKeyStore(SSLConfig sslConfig) throws NoSuchAlgorithmException, CertificateException, KeyStoreException, IOException {
 		return getEmptyKeyStore(sslConfig.getKeyStorePassword(), sslConfig.getKeyStoreType());
 	}
 	
@@ -126,12 +145,12 @@ public class SSLUtils {
 	 * @param keyStorePassword the key store password
 	 * @param keyStoreType the key store type
 	 * @return the empty key store
-	 * @throws KeyStoreException the key store exception
 	 * @throws NoSuchAlgorithmException the no such algorithm exception
 	 * @throws CertificateException the certificate exception
 	 * @throws IOException Signals that an I/O exception has occurred.
+	 * @throws KeyStoreException the key store exception
 	 */
-	public static KeyStore getEmptyKeyStore(String keyStorePassword, String keyStoreType) throws KeyStoreException, NoSuchAlgorithmException, CertificateException, IOException  {
+	public static KeyStore getEmptyKeyStore(String keyStorePassword, String keyStoreType) throws NoSuchAlgorithmException, CertificateException, IOException, KeyStoreException {
 		if(keyStorePassword == null) {
 			keyStorePassword = "";
 		}
@@ -140,6 +159,7 @@ public class SSLUtils {
 		return store;
 	}
 
+	
 	/**
 	 * Gets the SSL trust bypass context.
 	 *
@@ -203,11 +223,11 @@ public class SSLUtils {
 	 * @param sslConfig the ssl config
 	 * @return the SSL context with trust bypass
 	 * @throws KeyManagementException the key management exception
+	 * @throws UnrecoverableKeyException the unrecoverable key exception
 	 * @throws NoSuchAlgorithmException the no such algorithm exception
 	 * @throws KeyStoreException the key store exception
-	 * @throws UnrecoverableKeyException the unrecoverable key exception
 	 */
-	public static SSLContext getSSLContextWithTrustBypass(KeyStore keyStore, SSLConfig sslConfig) throws KeyManagementException, NoSuchAlgorithmException, KeyStoreException, UnrecoverableKeyException {
+	public static SSLContext getSSLContextWithTrustBypass(KeyStore keyStore, SSLConfig sslConfig) throws KeyManagementException, UnrecoverableKeyException, NoSuchAlgorithmException, KeyStoreException {
 		return getSSLContextWithTrustBypass(keyStore, sslConfig.getKeyStorePassword(), sslConfig.getKeyManagerAlgorithm(), sslConfig.getDefaultProtocol(), sslConfig.getSecureRandom());
 	}
 	
@@ -222,10 +242,10 @@ public class SSLUtils {
 	 * @return the SSL context with trust bypass
 	 * @throws KeyManagementException the key management exception
 	 * @throws NoSuchAlgorithmException the no such algorithm exception
-	 * @throws KeyStoreException the key store exception
 	 * @throws UnrecoverableKeyException the unrecoverable key exception
+	 * @throws KeyStoreException the key store exception
 	 */
-	public static SSLContext getSSLContextWithTrustBypass(KeyStore keyStore, String keyStorePass, String keyManagerAlgorithm, String defaultSSLProtocol, SecureRandom sRand) throws KeyManagementException, NoSuchAlgorithmException, KeyStoreException, UnrecoverableKeyException {
+	public static SSLContext getSSLContextWithTrustBypass(KeyStore keyStore, String keyStorePass, String keyManagerAlgorithm, String defaultSSLProtocol, SecureRandom sRand) throws KeyManagementException, NoSuchAlgorithmException, UnrecoverableKeyException, KeyStoreException {
 		KeyManager[] keyManagers = getKeyManagers(keyStore, keyStorePass, keyManagerAlgorithm);
 		return getSSLContext(keyManagers, getTrustManagerBypass(), defaultSSLProtocol, sRand);
 	}
@@ -239,11 +259,10 @@ public class SSLUtils {
 	 * @throws KeyStoreException the key store exception
 	 * @throws NoSuchAlgorithmException the no such algorithm exception
 	 * @throws KeyManagementException the key management exception
-	 * @throws FileNotFoundException the file not found exception
 	 * @throws CertificateException the certificate exception
 	 * @throws IOException Signals that an I/O exception has occurred.
 	 */
-	public static SSLContext getSSLContext(SSLConfig sslConfig) throws UnrecoverableKeyException, KeyStoreException, NoSuchAlgorithmException, KeyManagementException, FileNotFoundException, CertificateException, IOException {
+	public static SSLContext getSSLContext(SSLConfig sslConfig) throws UnrecoverableKeyException, KeyStoreException, NoSuchAlgorithmException, KeyManagementException, CertificateException, IOException {
 		KeyManager[] keyManagers = null;
 		if(sslConfig.hasKeyStore()) {
 			keyManagers = getKeyManagers(SSLUtils.getKeyStore(sslConfig), sslConfig.getKeyStorePassword(), sslConfig.getKeyManagerAlgorithm());	
@@ -268,12 +287,12 @@ public class SSLUtils {
 	 * @param defaultSSLProtocol the default SSL protocol
 	 * @param sRand the s rand
 	 * @return the SSL context
-	 * @throws UnrecoverableKeyException the unrecoverable key exception
-	 * @throws KeyStoreException the key store exception
-	 * @throws NoSuchAlgorithmException the no such algorithm exception
 	 * @throws KeyManagementException the key management exception
+	 * @throws NoSuchAlgorithmException the no such algorithm exception
+	 * @throws KeyStoreException the key store exception
+	 * @throws UnrecoverableKeyException the unrecoverable key exception
 	 */
-	public static SSLContext getSSLContext(KeyStore keyStore, String keyStorePass, String keyManagerAlgorithm, KeyStore trustStore, String trustManagerAlgorithm, String defaultSSLProtocol, SecureRandom sRand) throws UnrecoverableKeyException, KeyStoreException, NoSuchAlgorithmException, KeyManagementException {
+	public static SSLContext getSSLContext(KeyStore keyStore, String keyStorePass, String keyManagerAlgorithm, KeyStore trustStore, String trustManagerAlgorithm, String defaultSSLProtocol, SecureRandom sRand) throws KeyManagementException, NoSuchAlgorithmException, KeyStoreException, UnrecoverableKeyException {
 		KeyManager[] keyManagers = getKeyManagers(keyStore, keyStorePass, keyManagerAlgorithm);
 		TrustManager[] trustManagers = getTrustManagers(trustStore, trustManagerAlgorithm);
 		return getSSLContext(keyManagers, trustManagers, defaultSSLProtocol, sRand);
@@ -287,10 +306,10 @@ public class SSLUtils {
 	 * @param defaultSSLProtocol the default SSL protocol
 	 * @param sRand the s rand
 	 * @return the SSL context
-	 * @throws NoSuchAlgorithmException the no such algorithm exception
 	 * @throws KeyManagementException the key management exception
+	 * @throws NoSuchAlgorithmException the no such algorithm exception
 	 */
-	public static SSLContext getSSLContext(KeyManager[] keyManagers, TrustManager[] trustManagers, String defaultSSLProtocol, SecureRandom sRand) throws NoSuchAlgorithmException, KeyManagementException{
+	public static SSLContext getSSLContext(KeyManager[] keyManagers, TrustManager[] trustManagers, String defaultSSLProtocol, SecureRandom sRand) throws KeyManagementException, NoSuchAlgorithmException {
 		SecureRandom sRandom = sRand == null ? new SecureRandom() : sRand;
 		SSLContext sslContext = SSLContext.getInstance(defaultSSLProtocol);
 		sslContext.init(keyManagers, trustManagers, sRandom);
@@ -321,10 +340,10 @@ public class SSLUtils {
 	 * @param trustStore the trust store
 	 * @param trustManagerAlgorithm the trust manager algorithm
 	 * @return the trust managers
-	 * @throws NoSuchAlgorithmException the no such algorithm exception
 	 * @throws KeyStoreException the key store exception
+	 * @throws NoSuchAlgorithmException the no such algorithm exception
 	 */
-	public static TrustManager[] getTrustManagers(KeyStore trustStore, String trustManagerAlgorithm) throws NoSuchAlgorithmException, KeyStoreException {
+	public static TrustManager[] getTrustManagers(KeyStore trustStore, String trustManagerAlgorithm) throws KeyStoreException, NoSuchAlgorithmException {
 		String algorithm = trustManagerAlgorithm == null ? TrustManagerFactory.getDefaultAlgorithm() : trustManagerAlgorithm;
 		TrustManagerFactory trustManagerFactory = TrustManagerFactory.getInstance(algorithm);
 		trustManagerFactory.init(trustStore);
@@ -338,11 +357,8 @@ public class SSLUtils {
 	 * @param store the store
 	 * @param privateKeys the private keys
 	 * @throws KeyStoreException the key store exception
-	 * @throws NoSuchAlgorithmException the no such algorithm exception
-	 * @throws CertificateException the certificate exception
-	 * @throws IOException Signals that an I/O exception has occurred.
 	 */
-	public static void addAsymmetricKeysToKeyStore(KeyStore store, List<PrivateKeyInfo> privateKeys) throws KeyStoreException, NoSuchAlgorithmException, CertificateException, IOException {
+	public static void addAsymmetricKeysToKeyStore(KeyStore store, List<PrivateKeyInfo> privateKeys) throws KeyStoreException {
 		for(PrivateKeyInfo pkInfo: privateKeys) {
 			addAsymmetricKeyToKeyStore(store, pkInfo.certAlias, pkInfo.privateKey, pkInfo.privateKeyPass, pkInfo.certChain);
 		}
@@ -357,11 +373,8 @@ public class SSLUtils {
 	 * @param privateKeyPass the private key pass
 	 * @param certChain the cert chain
 	 * @throws KeyStoreException the key store exception
-	 * @throws NoSuchAlgorithmException the no such algorithm exception
-	 * @throws CertificateException the certificate exception
-	 * @throws IOException Signals that an I/O exception has occurred.
 	 */
-	public static void addAsymmetricKeyToKeyStore(KeyStore store, String certAlias, PrivateKey key, String privateKeyPass, X509Certificate[] certChain) throws KeyStoreException, NoSuchAlgorithmException, CertificateException, IOException {
+	public static void addAsymmetricKeyToKeyStore(KeyStore store, String certAlias, PrivateKey key, String privateKeyPass, X509Certificate[] certChain) throws KeyStoreException {
 		if(privateKeyPass == null) {
 			privateKeyPass = "";
 		}
@@ -374,11 +387,8 @@ public class SSLUtils {
 	 * @param store the store
 	 * @param publicKeys the public keys
 	 * @throws KeyStoreException the key store exception
-	 * @throws NoSuchAlgorithmException the no such algorithm exception
-	 * @throws CertificateException the certificate exception
-	 * @throws IOException Signals that an I/O exception has occurred.
 	 */
-	public static void addAsymmetricKeysToTrustStore(KeyStore store, List<PublicKeyInfo> publicKeys) throws KeyStoreException, NoSuchAlgorithmException, CertificateException, IOException {
+	public static void addAsymmetricKeysToTrustStore(KeyStore store, List<PublicKeyInfo> publicKeys) throws KeyStoreException {
 		for(PublicKeyInfo pkInfo: publicKeys) {
 			addAsymmetricKeyToTrustStore(store, pkInfo.certAlias, pkInfo.publicKey, pkInfo.certChain);
 		}
@@ -392,11 +402,8 @@ public class SSLUtils {
 	 * @param key the key
 	 * @param certChain the cert chain
 	 * @throws KeyStoreException the key store exception
-	 * @throws NoSuchAlgorithmException the no such algorithm exception
-	 * @throws CertificateException the certificate exception
-	 * @throws IOException Signals that an I/O exception has occurred.
 	 */
-	public static void addAsymmetricKeyToTrustStore(KeyStore store, String certAlias, PublicKey key, X509Certificate[] certChain) throws KeyStoreException, NoSuchAlgorithmException, CertificateException, IOException {
+	public static void addAsymmetricKeyToTrustStore(KeyStore store, String certAlias, PublicKey key, X509Certificate[] certChain) throws KeyStoreException {
 		store.setKeyEntry(certAlias, key.getEncoded(), certChain);
 	}
 	
@@ -456,10 +463,10 @@ public class SSLUtils {
 		 *
 		 * @param chain the chain
 		 * @param authType the auth type
-		 * @throws CertificateException the certificate exception
+		 
 		 */
 		@Override
-		public void checkClientTrusted(X509Certificate[] chain, String authType) throws CertificateException {
+		public void checkClientTrusted(X509Certificate[] chain, String authType) {
 			// accept all			
 		}
 
@@ -468,10 +475,10 @@ public class SSLUtils {
 		 *
 		 * @param chain the chain
 		 * @param authType the auth type
-		 * @throws CertificateException the certificate exception
+		 
 		 */
 		@Override
-		public void checkServerTrusted(X509Certificate[] chain, String authType) throws CertificateException {
+		public void checkServerTrusted(X509Certificate[] chain, String authType) {
 			// accept all
 		}
 

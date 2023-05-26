@@ -4,6 +4,7 @@ import java.security.SecureRandom;
 import java.util.HashSet;
 import java.util.Set;
 
+import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.KeyManagerFactory;
 import javax.net.ssl.TrustManagerFactory;
 
@@ -66,6 +67,8 @@ public class SSLConfig {
 	
 	/** The trust manager algorithm. */
 	private String trustManagerAlgorithm = null;
+	
+	private HostnameVerifier hostnameVerifier = null;
 	
 	/**
 	 * Instantiates a new SSL config.
@@ -370,6 +373,14 @@ public class SSLConfig {
 	 */
 	public void setTrustManagerAlgorithm(String trustManagerAlgorithm) {
 		this.trustManagerAlgorithm = trustManagerAlgorithm;
+	}
+
+	public HostnameVerifier getHostnameVerifier() {
+		return hostnameVerifier;
+	}
+
+	public void setHostnameVerifier(HostnameVerifier hostnameVerifier) {
+		this.hostnameVerifier = hostnameVerifier;
 	}
 }
 

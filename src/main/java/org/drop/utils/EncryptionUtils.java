@@ -55,7 +55,6 @@ import javax.crypto.spec.GCMParameterSpec;
 import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.PBEKeySpec;
 import javax.crypto.spec.SecretKeySpec;
-
 // TODO: Auto-generated Javadoc
 /**
  * The Class EncryptionUtils.
@@ -107,7 +106,7 @@ public class EncryptionUtils {
 	 * @throws KeyStoreException the key store exception
 	 * @throws NoSuchAlgorithmException the no such algorithm exception
 	 */
-	public static KeyPair getAsymmetricKeyPairFromKeyStore(KeyStore keyStore, String keyAlias, String keyPassword) throws UnrecoverableKeyException, KeyStoreException, NoSuchAlgorithmException{
+	public static KeyPair getAsymmetricKeyPairFromKeyStore(KeyStore keyStore, String keyAlias, String keyPassword) throws UnrecoverableKeyException, KeyStoreException, NoSuchAlgorithmException {
 		if(keyStore == null) {
 			throw new IllegalArgumentException("Invalid keystore. Keystore is null.");
 		}
@@ -123,50 +122,9 @@ public class EncryptionUtils {
 		return new KeyPair(publicKey, privateKey);
 	}
 	
-	/**
-	 * Gets the keystore.
-	 *
-	 * @param keyStoreFile the key store file
-	 * @param keyStorePasswd the key store passwd
-	 * @param keyStoreType the key store type
-	 * @return the keystore
-	 * @throws KeyStoreException the key store exception
-	 * @throws NoSuchAlgorithmException the no such algorithm exception
-	 * @throws CertificateException the certificate exception
-	 * @throws FileNotFoundException the file not found exception
-	 * @throws IOException Signals that an I/O exception has occurred.
-	 */
-	public static KeyStore getKeystore(String keyStoreFile, String keyStorePasswd, String keyStoreType) throws KeyStoreException, NoSuchAlgorithmException, CertificateException, FileNotFoundException, IOException{
-		if(keyStoreFile == null) {
-			throw new IllegalArgumentException("Invalid keystore. Keystore is null.");
-		}
-		return getKeystore(new File(keyStoreFile), keyStorePasswd, keyStoreType);
-	}
+
+
 	
-	/**
-	 * Gets the keystore.
-	 *
-	 * @param keyStoreFile the key store file
-	 * @param keyStorePasswd the key store passwd
-	 * @param keyStoreType the key store type
-	 * @return the keystore
-	 * @throws KeyStoreException the key store exception
-	 * @throws NoSuchAlgorithmException the no such algorithm exception
-	 * @throws CertificateException the certificate exception
-	 * @throws FileNotFoundException the file not found exception
-	 * @throws IOException Signals that an I/O exception has occurred.
-	 */
-	public static KeyStore getKeystore(File keyStoreFile, String keyStorePasswd, String keyStoreType) throws KeyStoreException, NoSuchAlgorithmException, CertificateException, FileNotFoundException, IOException{
-		if(keyStoreFile == null) {
-			throw new IllegalArgumentException("Invalid keystore. Keystore is null.");
-		}
-		if(!keyStoreFile.exists()) {
-			throw new IllegalArgumentException("Invalid keystore. Keystore does not exist. " + keyStoreFile.getPath());
-		}
-		KeyStore keystore = KeyStore.getInstance(keyStoreType);
-		keystore.load(new FileInputStream(keyStoreFile), keyStorePasswd.toCharArray());
-		return keystore;
-	}
 	
 	/**
 	 * Gets the private key from bytes.
@@ -174,11 +132,11 @@ public class EncryptionUtils {
 	 * @param base64URLdata the base 64 UR ldata
 	 * @param algorithm the algorithm
 	 * @return the private key from bytes
-	 * @throws InvalidKeySpecException the invalid key spec exception
 	 * @throws NoSuchAlgorithmException the no such algorithm exception
+	 * @throws InvalidKeySpecException the invalid key spec exception
 	 */
 	//signatureAlg comes from getSupportedAlgorithms("KeyFactory")
-	public static PrivateKey getPrivateKeyFromBytes(String base64URLdata, String algorithm) throws InvalidKeySpecException, NoSuchAlgorithmException {
+	public static PrivateKey getPrivateKeyFromBytes(String base64URLdata, String algorithm) throws NoSuchAlgorithmException, InvalidKeySpecException {
 		return getPrivateKeyFromBytes(base64URLDecode(base64URLdata), algorithm);
 	}
 	
@@ -204,11 +162,11 @@ public class EncryptionUtils {
 	 * @param base64URLdata the base 64 UR ldata
 	 * @param algorithm the algorithm
 	 * @return the public key from base 64 URL
-	 * @throws InvalidKeySpecException the invalid key spec exception
 	 * @throws NoSuchAlgorithmException the no such algorithm exception
+	 * @throws InvalidKeySpecException the invalid key spec exception
 	 */
 	//signatureAlg comes from getSupportedAlgorithms("KeyFactory")
-	public static PublicKey getPublicKeyFromBase64URL(String base64URLdata, String algorithm) throws InvalidKeySpecException, NoSuchAlgorithmException {
+	public static PublicKey getPublicKeyFromBase64URL(String base64URLdata, String algorithm) throws NoSuchAlgorithmException, InvalidKeySpecException {
 		return getPublicKeyFromBytes(base64URLDecode(base64URLdata), algorithm);
 	}
 	
@@ -218,11 +176,11 @@ public class EncryptionUtils {
 	 * @param data the data
 	 * @param algorithm the algorithm
 	 * @return the public key from bytes
-	 * @throws InvalidKeySpecException the invalid key spec exception
 	 * @throws NoSuchAlgorithmException the no such algorithm exception
+	 * @throws InvalidKeySpecException the invalid key spec exception
 	 */
 	//signatureAlg comes from getSupportedAlgorithms("KeyFactory")
-	public static PublicKey getPublicKeyFromBytes(byte[] data, String algorithm) throws InvalidKeySpecException, NoSuchAlgorithmException {
+	public static PublicKey getPublicKeyFromBytes(byte[] data, String algorithm) throws NoSuchAlgorithmException, InvalidKeySpecException {
 		X509EncodedKeySpec spec = new X509EncodedKeySpec(data);
 		KeyFactory keyFactory = KeyFactory.getInstance(algorithm);
 		return keyFactory.generatePublic(spec);
@@ -235,15 +193,14 @@ public class EncryptionUtils {
 	 * @param password the password
 	 * @param keyFactoryType the key factory type; EX: RSA, EC
 	 * @return the private key
-	 * @throws FileNotFoundException the file not found exception
 	 * @throws IOException Signals that an I/O exception has occurred.
 	 * @throws NoSuchAlgorithmException the no such algorithm exception
-	 * @throws NoSuchPaddingException the no such padding exception
 	 * @throws InvalidKeySpecException the invalid key spec exception
+	 * @throws NoSuchPaddingException the no such padding exception
 	 * @throws InvalidKeyException the invalid key exception
 	 * @throws InvalidAlgorithmParameterException the invalid algorithm parameter exception
 	 */
-	public static PrivateKey loadEncryptedPrivateKey(File certFile, String password, String keyFactoryType) throws FileNotFoundException, IOException, NoSuchAlgorithmException, NoSuchPaddingException, InvalidKeySpecException, InvalidKeyException, InvalidAlgorithmParameterException {
+	public static PrivateKey loadEncryptedPrivateKey(File certFile, String password, String keyFactoryType) throws IOException, NoSuchAlgorithmException, InvalidKeySpecException, NoSuchPaddingException, InvalidKeyException, InvalidAlgorithmParameterException {
 		if(certFile == null || !certFile.exists()) {
 			return null;
 		}
@@ -274,12 +231,11 @@ public class EncryptionUtils {
 	 * @return the private key
 	 * @throws FileNotFoundException the file not found exception
 	 * @throws IOException Signals that an I/O exception has occurred.
-	 * @throws CertificateException the certificate exception
 	 * @throws NoSuchAlgorithmException the no such algorithm exception
 	 * @throws InvalidKeySpecException the invalid key spec exception
 	 */
 	//keyFactoryType = RSA, EC
-	public static PrivateKey loadPrivateKey(File certFile, String keyFactoryType) throws FileNotFoundException, IOException, CertificateException, NoSuchAlgorithmException, InvalidKeySpecException {
+	public static PrivateKey loadPrivateKey(File certFile, String keyFactoryType) throws FileNotFoundException, IOException, NoSuchAlgorithmException, InvalidKeySpecException {
 		if(certFile == null || !certFile.exists()) {
 			return null;
 		}
@@ -391,14 +347,14 @@ public class EncryptionUtils {
 	 * @param key the key
 	 * @param cipherAlg the cipher alg
 	 * @return the byte[]
+	 * @throws InvalidKeyException the invalid key exception
 	 * @throws NoSuchAlgorithmException the no such algorithm exception
 	 * @throws NoSuchPaddingException the no such padding exception
-	 * @throws InvalidKeyException the invalid key exception
 	 * @throws IllegalBlockSizeException the illegal block size exception
 	 * @throws BadPaddingException the bad padding exception
 	 */
 	//cipherAlg comes from getSupportedAlgorithms("Cipher")
-	public static byte[] asymmetricDataEncrypt(String data, Key key, String cipherAlg) throws NoSuchAlgorithmException, NoSuchPaddingException, InvalidKeyException, IllegalBlockSizeException, BadPaddingException {
+	public static byte[] asymmetricDataEncrypt(String data, Key key, String cipherAlg) throws InvalidKeyException, NoSuchAlgorithmException, NoSuchPaddingException, IllegalBlockSizeException, BadPaddingException {
 		return asymmetricDataEncrypt(data.getBytes(DEFAULT_CHARSET), key, cipherAlg);
 	}
 	
@@ -410,14 +366,14 @@ public class EncryptionUtils {
 	 * @param key the key
 	 * @param cipherAlg the cipher alg
 	 * @return the byte[]
+	 * @throws InvalidKeyException the invalid key exception
 	 * @throws NoSuchAlgorithmException the no such algorithm exception
 	 * @throws NoSuchPaddingException the no such padding exception
-	 * @throws InvalidKeyException the invalid key exception
 	 * @throws IllegalBlockSizeException the illegal block size exception
 	 * @throws BadPaddingException the bad padding exception
 	 */
 	//cipherAlg comes from getSupportedAlgorithms("Cipher")
-	public static byte[] asymmetricDataEncrypt(String data, Charset charSet, Key key, String cipherAlg) throws NoSuchAlgorithmException, NoSuchPaddingException, InvalidKeyException, IllegalBlockSizeException, BadPaddingException {
+	public static byte[] asymmetricDataEncrypt(String data, Charset charSet, Key key, String cipherAlg) throws InvalidKeyException, NoSuchAlgorithmException, NoSuchPaddingException, IllegalBlockSizeException, BadPaddingException {
 		return asymmetricDataEncrypt(data.getBytes(charSet), key, cipherAlg);
 	}
 	
@@ -469,12 +425,12 @@ public class EncryptionUtils {
 	 * @param signatureAlg the signature alg
 	 * @param privateKey the private key
 	 * @return the byte[]
+	 * @throws InvalidKeyException the invalid key exception
 	 * @throws NoSuchAlgorithmException the no such algorithm exception
 	 * @throws SignatureException the signature exception
-	 * @throws InvalidKeyException the invalid key exception
 	 */
 	//signatureAlg comes from getSupportedAlgorithms("Signature")
-	public static byte[] signData(String data, String signatureAlg, PrivateKey privateKey) throws NoSuchAlgorithmException, SignatureException, InvalidKeyException {
+	public static byte[] signData(String data, String signatureAlg, PrivateKey privateKey) throws InvalidKeyException, NoSuchAlgorithmException, SignatureException {
 		return signData(data.getBytes(DEFAULT_CHARSET), signatureAlg, privateKey);
 	}
 		
@@ -486,12 +442,12 @@ public class EncryptionUtils {
 	 * @param signatureAlg the signature alg
 	 * @param privateKey the private key
 	 * @return the byte[]
+	 * @throws InvalidKeyException the invalid key exception
 	 * @throws NoSuchAlgorithmException the no such algorithm exception
 	 * @throws SignatureException the signature exception
-	 * @throws InvalidKeyException the invalid key exception
 	 */
 	//signatureAlg comes from getSupportedAlgorithms("Signature")
-	public static byte[] signData(String data, Charset charSet, String signatureAlg, PrivateKey privateKey) throws NoSuchAlgorithmException, SignatureException, InvalidKeyException {
+	public static byte[] signData(String data, Charset charSet, String signatureAlg, PrivateKey privateKey) throws InvalidKeyException, NoSuchAlgorithmException, SignatureException {
 		return signData(data.getBytes(charSet), signatureAlg, privateKey);
 	}
 	
@@ -503,11 +459,11 @@ public class EncryptionUtils {
 	 * @param privateKey the private key
 	 * @return the byte[]
 	 * @throws NoSuchAlgorithmException the no such algorithm exception
-	 * @throws SignatureException the signature exception
 	 * @throws InvalidKeyException the invalid key exception
+	 * @throws SignatureException the signature exception
 	 */
 	//signatureAlg comes from getSupportedAlgorithms("Signature")
-	public static byte[] signData(byte[] data, String signatureAlg, PrivateKey privateKey) throws NoSuchAlgorithmException, SignatureException, InvalidKeyException {
+	public static byte[] signData(byte[] data, String signatureAlg, PrivateKey privateKey) throws NoSuchAlgorithmException, InvalidKeyException, SignatureException {
 		Signature privateSignature = Signature.getInstance(signatureAlg);
 		privateSignature.initSign(privateKey);
 		privateSignature.update(data);
@@ -523,12 +479,12 @@ public class EncryptionUtils {
 	 * @param signatureAlg the signature alg
 	 * @param publicKey the public key
 	 * @return true, if successful
+	 * @throws InvalidKeyException the invalid key exception
 	 * @throws NoSuchAlgorithmException the no such algorithm exception
 	 * @throws SignatureException the signature exception
-	 * @throws InvalidKeyException the invalid key exception
 	 */
 	//signatureAlg comes from getSupportedAlgorithms("Signature")
-	public static boolean verifySignedData(String data, byte[] signature, String signatureAlg, PublicKey publicKey) throws NoSuchAlgorithmException, SignatureException, InvalidKeyException {
+	public static boolean verifySignedData(String data, byte[] signature, String signatureAlg, PublicKey publicKey) throws InvalidKeyException, NoSuchAlgorithmException, SignatureException {
 		return verifySignedData(data.getBytes(DEFAULT_CHARSET), signature, signatureAlg, publicKey);
 	}
 	
@@ -541,12 +497,12 @@ public class EncryptionUtils {
 	 * @param signatureAlg the signature alg
 	 * @param publicKey the public key
 	 * @return true, if successful
+	 * @throws InvalidKeyException the invalid key exception
 	 * @throws NoSuchAlgorithmException the no such algorithm exception
 	 * @throws SignatureException the signature exception
-	 * @throws InvalidKeyException the invalid key exception
 	 */
 	//signatureAlg comes from getSupportedAlgorithms("Signature")
-	public static boolean verifySignedData(String data, Charset charSet, byte[] signature, String signatureAlg, PublicKey publicKey) throws NoSuchAlgorithmException, SignatureException, InvalidKeyException {
+	public static boolean verifySignedData(String data, Charset charSet, byte[] signature, String signatureAlg, PublicKey publicKey) throws InvalidKeyException, NoSuchAlgorithmException, SignatureException {
 		return verifySignedData(data.getBytes(charSet), signature, signatureAlg, publicKey);
 	}
 	
@@ -559,11 +515,11 @@ public class EncryptionUtils {
 	 * @param publicKey the public key
 	 * @return true, if successful
 	 * @throws NoSuchAlgorithmException the no such algorithm exception
-	 * @throws SignatureException the signature exception
 	 * @throws InvalidKeyException the invalid key exception
+	 * @throws SignatureException the signature exception
 	 */
 	//signatureAlg comes from getSupportedAlgorithms("Signature")
-	public static boolean verifySignedData(byte[] data, byte[] signature, String signatureAlg, PublicKey publicKey) throws NoSuchAlgorithmException, SignatureException, InvalidKeyException {
+	public static boolean verifySignedData(byte[] data, byte[] signature, String signatureAlg, PublicKey publicKey) throws NoSuchAlgorithmException, InvalidKeyException, SignatureException {
 		Signature privateSignature = Signature.getInstance(signatureAlg);
 		privateSignature.initVerify(publicKey);
 		privateSignature.update(data);
@@ -612,11 +568,11 @@ public class EncryptionUtils {
 	 * @param key the key
 	 * @param keyGenAlg the key gen alg
 	 * @return the symmetric key from bytes
-	 * @throws NoSuchAlgorithmException the no such algorithm exception
-	 * @throws InvalidKeySpecException the invalid key spec exception
+	 
+	 
 	 */
 	//keyGenAlg comes from getSupportedAlgorithms("AlgorithmParameters")
-	public static SecretKey getSymmetricKeyFromBytes(byte[] key, String keyGenAlg) throws NoSuchAlgorithmException, InvalidKeySpecException {
+	public static SecretKey getSymmetricKeyFromBytes(byte[] key, String keyGenAlg) {
 	    return new SecretKeySpec(key, keyGenAlg);
 	}
 	
@@ -628,15 +584,15 @@ public class EncryptionUtils {
 	 * @param key the key
 	 * @param iv the iv
 	 * @return the byte[]
-	 * @throws NoSuchAlgorithmException the no such algorithm exception
-	 * @throws NoSuchPaddingException the no such padding exception
 	 * @throws InvalidKeyException the invalid key exception
 	 * @throws InvalidAlgorithmParameterException the invalid algorithm parameter exception
+	 * @throws NoSuchAlgorithmException the no such algorithm exception
+	 * @throws NoSuchPaddingException the no such padding exception
 	 * @throws IllegalBlockSizeException the illegal block size exception
 	 * @throws BadPaddingException the bad padding exception
 	 */
 	//cipherAlgorithm comes from getSupportedAlgorithms("Cipher")
-	public static byte[] symmetricDataEncrypt(String data, String cipherAlgorithm, Key key, AlgorithmParameterSpec iv) throws NoSuchAlgorithmException, NoSuchPaddingException, InvalidKeyException, InvalidAlgorithmParameterException, IllegalBlockSizeException, BadPaddingException {
+	public static byte[] symmetricDataEncrypt(String data, String cipherAlgorithm, Key key, AlgorithmParameterSpec iv) throws InvalidKeyException, InvalidAlgorithmParameterException, NoSuchAlgorithmException, NoSuchPaddingException, IllegalBlockSizeException, BadPaddingException {
 		return symmetricDataEncrypt(data.getBytes(DEFAULT_CHARSET), cipherAlgorithm, key, iv, null);
 	}
 	
@@ -649,14 +605,14 @@ public class EncryptionUtils {
 	 * @param charSet the char set
 	 * @param iv the iv
 	 * @return the byte[]
-	 * @throws NoSuchAlgorithmException the no such algorithm exception
-	 * @throws NoSuchPaddingException the no such padding exception
 	 * @throws InvalidKeyException the invalid key exception
 	 * @throws InvalidAlgorithmParameterException the invalid algorithm parameter exception
+	 * @throws NoSuchAlgorithmException the no such algorithm exception
+	 * @throws NoSuchPaddingException the no such padding exception
 	 * @throws IllegalBlockSizeException the illegal block size exception
 	 * @throws BadPaddingException the bad padding exception
 	 */
-	public static byte[] symmetricDataEncrypt(String data, String cipherAlgorithm, Key key, Charset charSet, AlgorithmParameterSpec iv) throws NoSuchAlgorithmException, NoSuchPaddingException, InvalidKeyException, InvalidAlgorithmParameterException, IllegalBlockSizeException, BadPaddingException {
+	public static byte[] symmetricDataEncrypt(String data, String cipherAlgorithm, Key key, Charset charSet, AlgorithmParameterSpec iv) throws InvalidKeyException, InvalidAlgorithmParameterException, NoSuchAlgorithmException, NoSuchPaddingException, IllegalBlockSizeException, BadPaddingException {
 		return symmetricDataEncrypt(data.getBytes(charSet), cipherAlgorithm, key, iv, null);
 	}
 	
@@ -669,15 +625,15 @@ public class EncryptionUtils {
 	 * @param iv the iv
 	 * @param addData the add data
 	 * @return the byte[]
-	 * @throws NoSuchAlgorithmException the no such algorithm exception
-	 * @throws NoSuchPaddingException the no such padding exception
 	 * @throws InvalidKeyException the invalid key exception
 	 * @throws InvalidAlgorithmParameterException the invalid algorithm parameter exception
+	 * @throws NoSuchAlgorithmException the no such algorithm exception
+	 * @throws NoSuchPaddingException the no such padding exception
 	 * @throws IllegalBlockSizeException the illegal block size exception
 	 * @throws BadPaddingException the bad padding exception
 	 */
 	//cipherAlgorithm comes from getSupportedAlgorithms("Cipher")
-	public static byte[] symmetricDataEncrypt(String data, String cipherAlgorithm, Key key, AlgorithmParameterSpec iv, byte[] addData) throws NoSuchAlgorithmException, NoSuchPaddingException, InvalidKeyException, InvalidAlgorithmParameterException, IllegalBlockSizeException, BadPaddingException {
+	public static byte[] symmetricDataEncrypt(String data, String cipherAlgorithm, Key key, AlgorithmParameterSpec iv, byte[] addData) throws InvalidKeyException, InvalidAlgorithmParameterException, NoSuchAlgorithmException, NoSuchPaddingException, IllegalBlockSizeException, BadPaddingException {
 		return symmetricDataEncrypt(data.getBytes(DEFAULT_CHARSET), cipherAlgorithm, key, iv, addData);
 	}
 	
@@ -691,15 +647,15 @@ public class EncryptionUtils {
 	 * @param iv the iv
 	 * @param addData the add data
 	 * @return the byte[]
-	 * @throws NoSuchAlgorithmException the no such algorithm exception
-	 * @throws NoSuchPaddingException the no such padding exception
 	 * @throws InvalidKeyException the invalid key exception
 	 * @throws InvalidAlgorithmParameterException the invalid algorithm parameter exception
+	 * @throws NoSuchAlgorithmException the no such algorithm exception
+	 * @throws NoSuchPaddingException the no such padding exception
 	 * @throws IllegalBlockSizeException the illegal block size exception
 	 * @throws BadPaddingException the bad padding exception
 	 */
 	//cipherAlgorithm comes from getSupportedAlgorithms("Cipher")
-	public static byte[] symmetricDataEncrypt(String data, String cipherAlgorithm, Key key, Charset charSet, AlgorithmParameterSpec iv, byte[] addData) throws NoSuchAlgorithmException, NoSuchPaddingException, InvalidKeyException, InvalidAlgorithmParameterException, IllegalBlockSizeException, BadPaddingException {
+	public static byte[] symmetricDataEncrypt(String data, String cipherAlgorithm, Key key, Charset charSet, AlgorithmParameterSpec iv, byte[] addData) throws InvalidKeyException, InvalidAlgorithmParameterException, NoSuchAlgorithmException, NoSuchPaddingException, IllegalBlockSizeException, BadPaddingException {
 		return symmetricDataEncrypt(data.getBytes(charSet), cipherAlgorithm, key, iv, addData);
 	}
 	
@@ -712,15 +668,15 @@ public class EncryptionUtils {
 	 * @param iv the iv
 	 * @param addData the add data
 	 * @return the byte[]
-	 * @throws NoSuchAlgorithmException the no such algorithm exception
-	 * @throws NoSuchPaddingException the no such padding exception
 	 * @throws InvalidKeyException the invalid key exception
 	 * @throws InvalidAlgorithmParameterException the invalid algorithm parameter exception
+	 * @throws NoSuchAlgorithmException the no such algorithm exception
+	 * @throws NoSuchPaddingException the no such padding exception
 	 * @throws IllegalBlockSizeException the illegal block size exception
 	 * @throws BadPaddingException the bad padding exception
 	 */
 	//cipherAlgorithm comes from getSupportedAlgorithms("Cipher")
-	public static byte[] symmetricDataEncrypt(byte[] data, String cipherAlgorithm, Key key, AlgorithmParameterSpec iv, byte[] addData) throws NoSuchAlgorithmException, NoSuchPaddingException, InvalidKeyException, InvalidAlgorithmParameterException, IllegalBlockSizeException, BadPaddingException {
+	public static byte[] symmetricDataEncrypt(byte[] data, String cipherAlgorithm, Key key, AlgorithmParameterSpec iv, byte[] addData) throws InvalidKeyException, InvalidAlgorithmParameterException, NoSuchAlgorithmException, NoSuchPaddingException, IllegalBlockSizeException, BadPaddingException {
 		Cipher encrypt = Cipher.getInstance(cipherAlgorithm);
 		encrypt.init(Cipher.ENCRYPT_MODE, key, iv);
 		if(addData != null) {
@@ -742,13 +698,13 @@ public class EncryptionUtils {
 	 * @throws NoSuchPaddingException the no such padding exception
 	 * @throws InvalidKeyException the invalid key exception
 	 * @throws InvalidAlgorithmParameterException the invalid algorithm parameter exception
-	 * @throws IllegalBlockSizeException the illegal block size exception
-	 * @throws BadPaddingException the bad padding exception
 	 * @throws FileNotFoundException the file not found exception
 	 * @throws IOException Signals that an I/O exception has occurred.
+	 * @throws IllegalBlockSizeException the illegal block size exception
+	 * @throws BadPaddingException the bad padding exception
 	 */
 	//cipherAlgorithm comes from getSupportedAlgorithms("Cipher")
-	public static byte[] symmetricFileEncrypt(File file, String cipherAlgorithm, Key key, AlgorithmParameterSpec iv, byte[] addData) throws NoSuchAlgorithmException, NoSuchPaddingException, InvalidKeyException, InvalidAlgorithmParameterException, IllegalBlockSizeException, BadPaddingException, FileNotFoundException, IOException {
+	public static byte[] symmetricFileEncrypt(File file, String cipherAlgorithm, Key key, AlgorithmParameterSpec iv, byte[] addData) throws NoSuchAlgorithmException, NoSuchPaddingException, InvalidKeyException, InvalidAlgorithmParameterException, FileNotFoundException, IOException, IllegalBlockSizeException, BadPaddingException {
 		Cipher encrypt = Cipher.getInstance(cipherAlgorithm);
 		encrypt.init(Cipher.ENCRYPT_MODE, key, iv);
 		if(addData != null) {
@@ -803,13 +759,13 @@ public class EncryptionUtils {
 	 * @throws NoSuchPaddingException the no such padding exception
 	 * @throws InvalidKeyException the invalid key exception
 	 * @throws InvalidAlgorithmParameterException the invalid algorithm parameter exception
-	 * @throws IllegalBlockSizeException the illegal block size exception
-	 * @throws BadPaddingException the bad padding exception
 	 * @throws FileNotFoundException the file not found exception
 	 * @throws IOException Signals that an I/O exception has occurred.
+	 * @throws IllegalBlockSizeException the illegal block size exception
+	 * @throws BadPaddingException the bad padding exception
 	 */
 	//cipherAlgorithm comes from getSupportedAlgorithms("Cipher")
-	public static byte[] symmetricFileDecrypt(File file, String cipherAlgorithm, Key key, AlgorithmParameterSpec iv, byte[] addData) throws NoSuchAlgorithmException, NoSuchPaddingException, InvalidKeyException, InvalidAlgorithmParameterException, IllegalBlockSizeException, BadPaddingException, FileNotFoundException, IOException {
+	public static byte[] symmetricFileDecrypt(File file, String cipherAlgorithm, Key key, AlgorithmParameterSpec iv, byte[] addData) throws NoSuchAlgorithmException, NoSuchPaddingException, InvalidKeyException, InvalidAlgorithmParameterException, FileNotFoundException, IOException, IllegalBlockSizeException, BadPaddingException {
 		Cipher decrypt = Cipher.getInstance(cipherAlgorithm);
 		decrypt.init(Cipher.DECRYPT_MODE, key, iv);
 		if(addData != null) {
@@ -855,11 +811,9 @@ public class EncryptionUtils {
 	 * @param algorithm the algorithm
 	 * @return the byte[]
 	 * @throws NoSuchAlgorithmException the no such algorithm exception
-	 * @throws FileNotFoundException the file not found exception
-	 * @throws IOException Signals that an I/O exception has occurred.
 	 */
 	//algorithm comes from getSupportedAlgorithms("MessageDigest")
-	public static byte[] generateHash(String data, String algorithm) throws NoSuchAlgorithmException, FileNotFoundException, IOException {
+	public static byte[] generateHash(String data, String algorithm) throws NoSuchAlgorithmException {
 		return generateHash(data.getBytes(), algorithm);
 	}
 	
@@ -870,11 +824,9 @@ public class EncryptionUtils {
 	 * @param algorithm the algorithm
 	 * @return the byte[]
 	 * @throws NoSuchAlgorithmException the no such algorithm exception
-	 * @throws FileNotFoundException the file not found exception
-	 * @throws IOException Signals that an I/O exception has occurred.
 	 */
 	//algorithm comes from getSupportedAlgorithms("MessageDigest")
-	public static byte[] generateHash(byte[] data, String algorithm) throws NoSuchAlgorithmException, FileNotFoundException, IOException {
+	public static byte[] generateHash(byte[] data, String algorithm) throws NoSuchAlgorithmException {
 		MessageDigest digest = MessageDigest.getInstance(algorithm);
 		return digest.digest(data);
 	}
@@ -922,10 +874,10 @@ public class EncryptionUtils {
 	 *
 	 * @param key the key
 	 * @return the string
-	 * @throws InvalidKeySpecException the invalid key spec exception
-	 * @throws NoSuchAlgorithmException the no such algorithm exception
+	 
+	 
 	 */
-	public static String base64URLEncode(Key key) throws InvalidKeySpecException, NoSuchAlgorithmException {
+	public static String base64URLEncode(Key key) {
 		return base64URLEncode(key.getEncoded());
 	}
 	
@@ -973,6 +925,7 @@ public class EncryptionUtils {
 	/**
 	 * Generate iv parameter spec. common: 8, 16, 24, 32
 	 *
+	 * @param size the size
 	 * @return the iv parameter spec
 	 */
 	public static IvParameterSpec generateIvParameterSpec(int size) {
