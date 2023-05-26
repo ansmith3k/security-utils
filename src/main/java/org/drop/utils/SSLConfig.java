@@ -68,6 +68,7 @@ public class SSLConfig {
 	/** The trust manager algorithm. */
 	private String trustManagerAlgorithm = null;
 	
+	/** The hostname verifier. */
 	private HostnameVerifier hostnameVerifier = null;
 	
 	/**
@@ -375,10 +376,20 @@ public class SSLConfig {
 		this.trustManagerAlgorithm = trustManagerAlgorithm;
 	}
 
+	/**
+	 * Gets the hostname verifier.
+	 *
+	 * @return the hostname verifier
+	 */
 	public HostnameVerifier getHostnameVerifier() {
 		return hostnameVerifier;
 	}
 
+	/**
+	 * Sets the hostname verifier.
+	 *
+	 * @param hostnameVerifier the new hostname verifier
+	 */
 	public void setHostnameVerifier(HostnameVerifier hostnameVerifier) {
 		this.hostnameVerifier = hostnameVerifier;
 	}

@@ -58,6 +58,7 @@ import javax.crypto.spec.SecretKeySpec;
 // TODO: Auto-generated Javadoc
 /**
  * The Class EncryptionUtils.
+ * https://docs.oracle.com/en/java/javase/17/docs/specs/security/standard-names.html
  */
 public class EncryptionUtils {
 	
@@ -81,8 +82,8 @@ public class EncryptionUtils {
 	/**
 	 * Gets the asymmetric key pair generator.
 	 *
-	 * @param keyPairAlg the key pair alg
-	 * @param keySize the key size
+	 * @param keyPairAlg the key pair alg [DiffieHellman, DSA, RSA, RSASSA-PSS, EC] 
+	 * @param keySize the key size 
 	 * @param sRand the s rand
 	 * @return the asymmetric key pair generator
 	 * @throws NoSuchAlgorithmException the no such algorithm exception
@@ -554,6 +555,7 @@ public class EncryptionUtils {
 	 * @return the secret key
 	 * @throws NoSuchAlgorithmException the no such algorithm exception
 	 * @throws InvalidKeySpecException the invalid key spec exception
+	 * Example: generateNewSymmetricKey("PBKDF2WITHHMACSHA512", "AES", "password", salt, 65535, 256)
 	 */
 	//keyGenAlg comes from getSupportedAlgorithms("AlgorithmParameters")
 	public static SecretKey generateNewSymmetricKey(String factoryAlogrithm, String keyGenAlg, String password, byte[] salt, int iterations, int keyLength) throws NoSuchAlgorithmException, InvalidKeySpecException {
@@ -568,8 +570,6 @@ public class EncryptionUtils {
 	 * @param key the key
 	 * @param keyGenAlg the key gen alg
 	 * @return the symmetric key from bytes
-	 
-	 
 	 */
 	//keyGenAlg comes from getSupportedAlgorithms("AlgorithmParameters")
 	public static SecretKey getSymmetricKeyFromBytes(byte[] key, String keyGenAlg) {
@@ -593,14 +593,15 @@ public class EncryptionUtils {
 	 */
 	//cipherAlgorithm comes from getSupportedAlgorithms("Cipher")
 	public static byte[] symmetricDataEncrypt(String data, String cipherAlgorithm, Key key, AlgorithmParameterSpec iv) throws InvalidKeyException, InvalidAlgorithmParameterException, NoSuchAlgorithmException, NoSuchPaddingException, IllegalBlockSizeException, BadPaddingException {
-		return symmetricDataEncrypt(data.getBytes(DEFAULT_CHARSET), cipherAlgorithm, key, iv, null);
+		return symmetricDataEncrypt(data.getBytes(DEFAULT_CHARSET), cipherAlgorithm, key, iv);
 	}
+
 	
 	/**
 	 * Symmetric data encrypt.
 	 *
 	 * @param data the data
-	 * @param cipherAlgorithm the cipher algorithm; getSupportedAlgorithms("Cipher")
+	 * @param cipherAlgorithm the cipher algorithm
 	 * @param key the key
 	 * @param charSet the char set
 	 * @param iv the iv
@@ -612,8 +613,9 @@ public class EncryptionUtils {
 	 * @throws IllegalBlockSizeException the illegal block size exception
 	 * @throws BadPaddingException the bad padding exception
 	 */
+	//cipherAlgorithm comes from getSupportedAlgorithms("Cipher")
 	public static byte[] symmetricDataEncrypt(String data, String cipherAlgorithm, Key key, Charset charSet, AlgorithmParameterSpec iv) throws InvalidKeyException, InvalidAlgorithmParameterException, NoSuchAlgorithmException, NoSuchPaddingException, IllegalBlockSizeException, BadPaddingException {
-		return symmetricDataEncrypt(data.getBytes(charSet), cipherAlgorithm, key, iv, null);
+		return symmetricDataEncrypt(data.getBytes(charSet), cipherAlgorithm, key, iv);
 	}
 	
 	/**
@@ -623,7 +625,6 @@ public class EncryptionUtils {
 	 * @param cipherAlgorithm the cipher algorithm
 	 * @param key the key
 	 * @param iv the iv
-	 * @param addData the add data
 	 * @return the byte[]
 	 * @throws InvalidKeyException the invalid key exception
 	 * @throws InvalidAlgorithmParameterException the invalid algorithm parameter exception
@@ -633,55 +634,9 @@ public class EncryptionUtils {
 	 * @throws BadPaddingException the bad padding exception
 	 */
 	//cipherAlgorithm comes from getSupportedAlgorithms("Cipher")
-	public static byte[] symmetricDataEncrypt(String data, String cipherAlgorithm, Key key, AlgorithmParameterSpec iv, byte[] addData) throws InvalidKeyException, InvalidAlgorithmParameterException, NoSuchAlgorithmException, NoSuchPaddingException, IllegalBlockSizeException, BadPaddingException {
-		return symmetricDataEncrypt(data.getBytes(DEFAULT_CHARSET), cipherAlgorithm, key, iv, addData);
-	}
-	
-	/**
-	 * Symmetric data encrypt.
-	 *
-	 * @param data the data
-	 * @param cipherAlgorithm the cipher algorithm
-	 * @param key the key
-	 * @param charSet the char set
-	 * @param iv the iv
-	 * @param addData the add data
-	 * @return the byte[]
-	 * @throws InvalidKeyException the invalid key exception
-	 * @throws InvalidAlgorithmParameterException the invalid algorithm parameter exception
-	 * @throws NoSuchAlgorithmException the no such algorithm exception
-	 * @throws NoSuchPaddingException the no such padding exception
-	 * @throws IllegalBlockSizeException the illegal block size exception
-	 * @throws BadPaddingException the bad padding exception
-	 */
-	//cipherAlgorithm comes from getSupportedAlgorithms("Cipher")
-	public static byte[] symmetricDataEncrypt(String data, String cipherAlgorithm, Key key, Charset charSet, AlgorithmParameterSpec iv, byte[] addData) throws InvalidKeyException, InvalidAlgorithmParameterException, NoSuchAlgorithmException, NoSuchPaddingException, IllegalBlockSizeException, BadPaddingException {
-		return symmetricDataEncrypt(data.getBytes(charSet), cipherAlgorithm, key, iv, addData);
-	}
-	
-	/**
-	 * Symmetric data encrypt.
-	 *
-	 * @param data the data
-	 * @param cipherAlgorithm the cipher algorithm
-	 * @param key the key
-	 * @param iv the iv
-	 * @param addData the add data
-	 * @return the byte[]
-	 * @throws InvalidKeyException the invalid key exception
-	 * @throws InvalidAlgorithmParameterException the invalid algorithm parameter exception
-	 * @throws NoSuchAlgorithmException the no such algorithm exception
-	 * @throws NoSuchPaddingException the no such padding exception
-	 * @throws IllegalBlockSizeException the illegal block size exception
-	 * @throws BadPaddingException the bad padding exception
-	 */
-	//cipherAlgorithm comes from getSupportedAlgorithms("Cipher")
-	public static byte[] symmetricDataEncrypt(byte[] data, String cipherAlgorithm, Key key, AlgorithmParameterSpec iv, byte[] addData) throws InvalidKeyException, InvalidAlgorithmParameterException, NoSuchAlgorithmException, NoSuchPaddingException, IllegalBlockSizeException, BadPaddingException {
+	public static byte[] symmetricDataEncrypt(byte[] data, String cipherAlgorithm, Key key, AlgorithmParameterSpec iv) throws InvalidKeyException, InvalidAlgorithmParameterException, NoSuchAlgorithmException, NoSuchPaddingException, IllegalBlockSizeException, BadPaddingException {
 		Cipher encrypt = Cipher.getInstance(cipherAlgorithm);
 		encrypt.init(Cipher.ENCRYPT_MODE, key, iv);
-		if(addData != null) {
-			encrypt.update(addData);
-		}
 		return encrypt.doFinal(data);
 	}
 	
@@ -692,7 +647,6 @@ public class EncryptionUtils {
 	 * @param cipherAlgorithm the cipher algorithm
 	 * @param key the key
 	 * @param iv the iv
-	 * @param addData the add data
 	 * @return the byte[]
 	 * @throws NoSuchAlgorithmException the no such algorithm exception
 	 * @throws NoSuchPaddingException the no such padding exception
@@ -704,12 +658,9 @@ public class EncryptionUtils {
 	 * @throws BadPaddingException the bad padding exception
 	 */
 	//cipherAlgorithm comes from getSupportedAlgorithms("Cipher")
-	public static byte[] symmetricFileEncrypt(File file, String cipherAlgorithm, Key key, AlgorithmParameterSpec iv, byte[] addData) throws NoSuchAlgorithmException, NoSuchPaddingException, InvalidKeyException, InvalidAlgorithmParameterException, FileNotFoundException, IOException, IllegalBlockSizeException, BadPaddingException {
+	public static byte[] symmetricFileEncrypt(File file, String cipherAlgorithm, Key key, AlgorithmParameterSpec iv) throws NoSuchAlgorithmException, NoSuchPaddingException, InvalidKeyException, InvalidAlgorithmParameterException, FileNotFoundException, IOException, IllegalBlockSizeException, BadPaddingException {
 		Cipher encrypt = Cipher.getInstance(cipherAlgorithm);
 		encrypt.init(Cipher.ENCRYPT_MODE, key, iv);
-		if(addData != null) {
-			encrypt.update(addData);
-		}
 		byte[] buffer = new byte[8192];
 		try(BufferedInputStream bufInStream = new BufferedInputStream(new FileInputStream(file))) {
 			int cnt = 0;
@@ -737,12 +688,9 @@ public class EncryptionUtils {
 	 * @throws BadPaddingException the bad padding exception
 	 */
 	//cipherAlgorithm comes from getSupportedAlgorithms("Cipher")
-	public static byte[] symmetricDataDecrypt(byte[] data, String cipherAlgorithm, Key key, AlgorithmParameterSpec iv, byte[] addData) throws NoSuchAlgorithmException, NoSuchPaddingException, InvalidKeyException, InvalidAlgorithmParameterException, IllegalBlockSizeException, BadPaddingException {
+	public static byte[] symmetricDataDecrypt(byte[] data, String cipherAlgorithm, Key key, AlgorithmParameterSpec iv) throws NoSuchAlgorithmException, NoSuchPaddingException, InvalidKeyException, InvalidAlgorithmParameterException, IllegalBlockSizeException, BadPaddingException {
 		Cipher decrypt = Cipher.getInstance(cipherAlgorithm);
 		decrypt.init(Cipher.DECRYPT_MODE, key, iv);
-		if(addData != null) {
-			decrypt.update(addData);
-		}
 		return decrypt.doFinal(data);
 	}
 	
@@ -765,12 +713,9 @@ public class EncryptionUtils {
 	 * @throws BadPaddingException the bad padding exception
 	 */
 	//cipherAlgorithm comes from getSupportedAlgorithms("Cipher")
-	public static byte[] symmetricFileDecrypt(File file, String cipherAlgorithm, Key key, AlgorithmParameterSpec iv, byte[] addData) throws NoSuchAlgorithmException, NoSuchPaddingException, InvalidKeyException, InvalidAlgorithmParameterException, FileNotFoundException, IOException, IllegalBlockSizeException, BadPaddingException {
+	public static byte[] symmetricFileDecrypt(File file, String cipherAlgorithm, Key key, AlgorithmParameterSpec iv) throws NoSuchAlgorithmException, NoSuchPaddingException, InvalidKeyException, InvalidAlgorithmParameterException, FileNotFoundException, IOException, IllegalBlockSizeException, BadPaddingException {
 		Cipher decrypt = Cipher.getInstance(cipherAlgorithm);
 		decrypt.init(Cipher.DECRYPT_MODE, key, iv);
-		if(addData != null) {
-			decrypt.update(addData);
-		}
 		byte[] buffer = new byte[8192];
 		try(BufferedInputStream bufInStream = new BufferedInputStream(new FileInputStream(file))) {
 			int cnt = 0;
@@ -957,11 +902,22 @@ public class EncryptionUtils {
 	 * Generate GCM parameter spec.
 	 *
 	 * @param tagLenInBits the tag len in bits; options: 128, 120, 112, 104, or 96 only.
-	 * @param iv the iv
+	 * @param dataBytes the bytes of data to pull the GCM from
 	 * @return the GCM parameter spec
 	 */
-	public static GCMParameterSpec generateGCMParameterSpec(int tagLenInBits, byte[] iv) {
-		return new GCMParameterSpec(tagLenInBits, iv);
+	public static GCMParameterSpec generateGCMParameterSpec(int tagLenInBits, byte[] dataBytes) {
+		return new GCMParameterSpec(tagLenInBits, dataBytes);
+	}
+	
+	/**
+	 * Generate GCM parameter spec.
+	 *
+	 * @param tagLenInBits the tag len in bits; options: 128, 120, 112, 104, or 96 only.
+	 * @param data the base64 encode data used to pull GCM from
+	 * @return the GCM parameter spec
+	 */
+	public static GCMParameterSpec base64URLToGCMSpec(int tagLenInBits, String data) {
+		return new GCMParameterSpec(tagLenInBits, base64URLDecode(data));
 	}
 	
 	/**
